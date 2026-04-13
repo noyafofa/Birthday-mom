@@ -25,15 +25,183 @@
             height: 100vh;
             overflow: hidden;
             color: #4a4a4a;
-            position: relative;
         }
 
-        /* --- אנימציית לבבות ברקע --- */
-        .heart-bg {
-            position: fixed;
-            top: -10%;
-            user-select: none;
-            pointer-events: none;
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            border: 2px solid var(--gold);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { color: #d63384; font-family: 'Secular One', sans-serif; }
+        
+        .door-container {
+            font-size: 80px;
+            margin: 20px 0;
+            transition: transform 0.5s;
+        }
+
+        .door-open {
+            transform: scale(1.2) rotateY(180deg);
+            opacity: 0.5;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid var(--pink);
+            border-radius: 25px;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--gold);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #b8962d;
+        }
+
+        .message { margin-top: 10px; font-weight: bold; height: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="intro" class="screen active">
+            <h1>מזל טוב מאמו🩷🩵</h1>
+            <p>אוהבת מאוד מאוד, נויה</p>
+            <div class="door-container">🎁</div>
+            <button onclick="nextRoom('intro', 'room1')">מתחילים?</button>
+        </div>
+
+        <div id="room1" class="screen">
+            <h2>חדר 1: המטבח 🍳</h2>
+            <p>באיזו מסעדה היה את המאכל האהוב עליך?</p>
+            <div id="door1" class="door-container">🚪</div>
+            <input type="text" id="ans1" placeholder="כתבי כאן...">
+            <br>
+            <button onclick="checkAnswer(1, 'שטמפפר', 'room1', 'room2')">בדקי אותי</button>
+            <div id="msg1" class="message"></div>
+        </div>
+
+        <div id="room2" class="screen">
+            <h2>חדר 2: חדר הקריאה 📖</h2>
+            <p>איזה ספר את קראת הרבה מאוד מאוד פעמים?</p>
+            <div id="door2" class="door-container">🚪</div>
+            <input type="text" id="ans2" placeholder="כתבי כאן...">
+            <br>
+            <button onclick="checkAnswer(2, 'אסון יפהפה', 'room2', 'room3')">בדקי אותי</button>
+            <div id="msg2" class="message"></div>
+        </div>
+
+        <div id="room3" class="screen">
+            <h2>חדר אחרון: הזיכרונות 🗓️</h2>
+            <p>מה התאריך היום?</p>
+            <div id="door3" class="door-container">🚪</div>
+            <input type="text" id="ans3" placeholder="פורמט: DD.MM.YYYY">
+            <br>
+            <button onclick="checkAnswer(3, '21.9.2026', 'room3', 'victory')">לצאת לחופש!</button>
+            <div id="msg3" class="message"></div>
+        </div>
+
+        <div id="victory" class="screen">
+            <h1>🎉 ישששש! 🎉</h1>
+            <p style="font-size: 1.2em; line-height: 1.6;">
+                אני 💖אוהבת אותך מאמו 🩷 <br>
+                מאחלת לך הרבה מזל טוב, שמחה, בריאות <br>
+                והכי חשוב! אושר ועושר
+            </p>
+            <div style="font-size: 60px;">🎂👑🥂</div>
+        </div>
+    </div>
+
+    <script>
+        function nextRoom(current, next) {
+            document.getElementById(current).classList.remove('active');
+            document.getElementById(next).classList.add('active');
+            if(next === 'victory') {
+                launchConfetti();
+            }
+        }
+
+        function checkAnswer(num, correct, currentId, nextId) {
+            const userAns = document.getElementById('ans' + num).value.trim();
+            const msg = document.getElementById('msg' + num);
+            const door = document.getElementById('door' + num);
+
+            if (userAns === correct) {
+                msg.style.color = "green";
+                msg.innerText = "נכון מאוד! הדלת נפתחת...";
+                door.classList.add('door-open');
+                
+                setTimeout(() => {
+                    nextRoom(currentId, nextId);
+                }, 1500);
+            } else {
+                msg.style.color = "red";
+                msg.innerText = "אופס... נסי שוב!";
+            }
+        }
+
+        function launchConfetti() {
+            var duration = 5 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ffb7c5', '#d4af37']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ffb7c5', '#d4af37']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>
             z-index: 0;
             animation: float linear infinite;
         }
