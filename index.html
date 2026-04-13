@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מזל טוב מאמו! 💖</title>
+    <title>המשימה של יפעת! 🎈</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700&family=Secular+One&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --pink: #ffb7c5;
             --gold: #d4af37;
-            --white: #ffffff;
+            --dark-pink: #d63384;
             --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
         }
 
@@ -23,17 +23,116 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
             color: #4a4a4a;
         }
 
         .container {
             width: 90%;
             max-width: 500px;
-            background: rgba(255, 255, 255, 0.9);
+            background: white;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 2px solid var(--pink);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h1 { color: var(--dark-pink); font-family: 'Secular One', sans-serif; }
+        h2 { color: var(--gold); }
+        
+        .icon-display {
+            font-size: 70px;
+            margin: 20px 0;
+            transition: transform 0.4s;
+        }
+
+        .door-open {
+            transform: scale(1.2);
+            opacity: 0.7;
+        }
+
+        input {
+            width: 85%;
+            padding: 12px;
+            border: 2px solid var(--pink);
+            border-radius: 25px;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--gold);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #b8962d;
+        }
+
+        .message { margin-top: 10px; font-weight: bold; height: 20px; }
+        .hint { font-size: 0.8em; color: #999; margin-top: 5px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="story" class="screen active">
+            <h1>אוי לא! 😱</h1>
+            <p>החברים ארגנו מסיבת הפתעה ליפעת אבל, אוי! הדלת לא נפתחת.</p>
+            <p>רק אם נפתור את 3 השאלות הללו, הדלת תיפתח ונוכל ללכת למסיבה!</p>
+            <div class="icon-display">🔐</div>
+            <button onclick="nextRoom('story', 'intro')">בואי נתחיל!</button>
+        </div>
+
+        <div id="intro" class="screen">
+            <h1>מזל טוב מאמו🩷🩵</h1>
+            <p>אוהבת מאוד מאוד, נויה</p>
+            <div class="icon-display">🎁</div>
+            <button onclick="nextRoom('intro', 'room1')">אני מוכנה!</button>
+        </div>
+
+        <div id="room1" class="screen">
+            <h2>חדר 1: המטבח 🍳</h2>
+            <p>באיזו מסעדה היה את המאכל האהוב עליך?</p>
+            <div id="door1" class="icon-display">🚪</div>
+            <input type="text" id="ans1" placeholder="תשובה...">
+            <br>
+            <button onclick="checkAnswer(1, 'שטמפפר', 'room1', 'room2')">בדיקה</button>
+            <div id="msg1" class="message"></div>
+        </div>
+
+        <div id="room2" class="screen">
+            <h2>חדר 2: חדר הפנאי 📖</h2>
+            <p>איזה ספר את קראת הרבה מאוד מאוד פעמים?</p>
+            <div id="door2" class="icon-display">🚪</div>
+            <input type="text" id="ans2" placeholder="תשובה...">
+            <br>
+            <button onclick="checkAnswer(2, 'אסון יפהפה', 'room2', 'room3')
             text-align: center;
             position: relative;
             border: 2px solid var(--gold);
