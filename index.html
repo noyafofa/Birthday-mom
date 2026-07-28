@@ -3,37 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>יום הולדת שמח! 🎈</title>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700&family=Secular+One&display=swap" rel="stylesheet">
+    <title>המשימה של שלומית! 🎈</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --pink: #ffb7c5;
-            --gold: #d4af37;
-            --dark-pink: #d63384;
-            --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
+            --primary: #ff8fa3;
+            --accent: #d4af37;
+            --bg: #fdf2f4;
+            --shadow: rgba(214, 51, 132, 0.2);
         }
 
         body {
             font-family: 'Assistant', sans-serif;
+            background-color: var(--bg);
             margin: 0;
-            padding: 0;
-            background: var(--bg-gradient);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #4a4a4a;
+            overflow: hidden;
+            perspective: 1000px; /* נותן עומק תלת-ממדי לכל הדף */
         }
 
-        .container {
+        .game-card {
+            background: #ffffff;
             width: 90%;
-            max-width: 500px;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
             text-align: center;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateZ(-100px); }
+            to { opacity: 1; transform: translateZ(0); }
+        }
+
+        h1 { color: #d63384; font-weight: 800; font-size: 2rem; margin-bottom: 10px; }
+        p { font-size: 1.1rem; color: #555; line-height: 1.6; }
+
+        /* עיצוב הדלת התלת-ממדית */
+        .door-wrapper {
+            width: 120px;
+            height: 160px;
+            margin: 30px auto;
+            perspective: 600px;
+            position: relative;
+        }
+
+        .door {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #ffb7c5, #ff8fa3);
+            border-radius: 10px;
+            border: 4px solid white;
+            box-shadow: 5px 5px 15px var(--shadow);
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: default;
+        }
+
+        .door-open {
+            transform: rotateY(-110deg);
+        }
+
+        .door-frame {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #eee;
+            border-radius: 10px;
+            z-index: -1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+        }
+
+        /* שדות קלט וכפתורים מקצועיים */
+        input {
+            width: 80%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background: #f0f0f0;
+            box-shadow: inset 5px 5px 10px #ccc, inset -5px -5px 10px #fff;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 25px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            box-shadow: inset 2px 2px 5px #ccc, inset -2px -2px 5px #fff;
+            border: 1px solid var(--primary);
+        }
+
+        button {
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(145deg, #ff9fb1, #e68092);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 6px 6px 12px #d1d1d1, -6px -6px 12px #ffffff;
+            transition: 0.2s;
+        }
+
+        button:active {
+            box-shadow: 2px 2px 5px #d1d1d1, -2px -2px 5px #ffffff;
+            transform: translateY(2px);
+        }
+
+        .message { margin-top: 15px; font-weight: 600; min-height: 24px; }
+
+        #victory h1 { font-size: 3rem; color: gold; text-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="game-card" id="card">
+        
+        <div id="story" class="screen active">
+            <h1>אוי לא! 😱</h1>
+            <p>החברים ארגנו מסיבת הפתעה ל<b>שלומית</b>, אבל הדלת נעולה!</p>
+            <p>רק אם תפתרי את 3 החידות, נוכל להיכנס למסיבה.</p>
+            <div class="door-wrapper">
+                <div class="door" id="main-lock">🔒</div>
+            </div>
+            <button onclick="nextRoom('story', 'intro')">אני מוכנה למשימה!</button>
+        </div>
+
+        <div id="intro" class="screen">
+            <h1>מזל טוב מאמו!🩷</h1>
+            <p>אוהבת אותך הכי בעולם, נויה</p>
+            <div style="font-size: 80px; margin: 20px;">🎉</div>
+            <button onclick="nextRoom('intro', 'room1')">בואי נתחיל בחידות</button>
+        </div>
+
+        <div id="room1" class="screen">
+            <h2>חידה 1: המטבח 🍳</h2>
+            <p>באיזו מסעדה היה את המאכל האהוב עליך?</p>
+            <div class="door-wrapper">
+                <div class="door-frame">✨</div>
+                <div class="door" id="door1">🚪</div>
+            </div>
+            <input type="text" id="ans1" placeholder="תשובה..." autocomplete="off">
+            <button onclick="checkAnswer(1, 'שטמפפר', 'room1', 'room2')">בדקי אותי</button>
+            <div id="msg1" class="message"></div>
+        </div>
+
+        <div id="room2" class="screen">
+            <h2>חידה 2: חדר הפנאי 📖</h2>
+            <p>איזה ספר קראת הרבה מאוד פעמים?</p>
+            <div class="door-wrapper">
+                <div class="door-frame">✨</div>
+                <div class="door" id="door2">🚪</div>
+            </div>
+            <input type="text" id="ans2" placeholder="תשובה..." autocomplete="off">
+            <button onclick="checkAnswer(2, 'אסון יפהפה', 'room2', 'room3')">בדקי אותי</button>
+            <div id="msg2" class="message"></div>
+        </div>
+
+        <div id="room3" class="screen">
+            <h2>חידה 3: התאריך 🗓️</h2>
+            <p>מה התאריך של היום המיוחד הזה?</p>
+            <div class="door-wrapper">
+                <div class="door-frame">🎂</div>
+                <div class="door" id="door3">🚪</div>
+            </div>
+            <input type="text" id="ans3" placeholder="21.9.2026" autocomplete="off">
+            <button onclick="checkAnswer(3, '21.9.2026', 'room3', 'victory')">פתחי את הדלת האחרונה!</button>
+            <div id="msg3" class="message"></div>
+        </div>
+
+        <div id="victory" class="screen">
+            <h1>🎉 יששש! 🎉</h1>
+            <p style="font-size: 1.3rem; color: #d63384; font-weight: bold;">
+                הצלחת לפתוח את כל הדלתות!
+            </p>
+            <p>
+                אני 💖 אוהבת אותך מאמו 🩷<br>
+                מאחלת לך הרבה שמחה, בריאות ואושר!
+            </p>
+            <div style="font-size: 70px;">🎂💃🥂</div>
+        </div>
+
+    </div>
+
+    <script>
+        // אפקט הטיה תלת-ממדית עם העכבר/מגע
+        const card = document.getElementById('card');
+        document.addEventListener('mousemove', (e) => {
+            let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        function nextRoom(current, next) {
+            document.getElementById(current).classList.remove('active');
+            document.getElementById(next).classList.add('active');
+            // איפוס זווית הכרטיס במעבר
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            
+            if(next === 'victory') {
+                launchConfetti();
+            }
+        }
+
+        function checkAnswer(num, correct, currentId, nextId) {
+            const val = document.getElementById('ans' + num).value.trim();
+            const msg = document.getElementById('msg' + num);
+            const door = document.getElementById('door' + num);
+
+            if (val === correct) {
+                msg.style.color = "#2ecc71";
+                msg.innerText = "מדהים! הדלת נפתחת...";
+                door.classList.add('door-open');
+                
+                setTimeout(() => {
+                    nextRoom(currentId, nextId);
+                }, 1500);
+            } else {
+                msg.style.color = "#e74c3c";
+                msg.innerText = "אופס, נסי שוב מאמו";
+                card.style.animation = "shake 0.4s";
+                setTimeout(() => card.style.animation = "", 400);
+            }
+        }
+
+        function launchConfetti() {
+            var duration = 5 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff8fa3', '#d4af37']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff8fa3', '#d4af37']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+
+    <style>
+        /* אנימציית רעידה בטעות */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+</body>
+</html>
             border: 2px solid var(--pink);
         }
 
